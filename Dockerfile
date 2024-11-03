@@ -1,0 +1,106 @@
+# Use multi-stage builds for architecture-specific images
+FROM alpine:3.15 AS base
+
+# Set non-interactive mode for container build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Dockerfile ARG variables for architecture
+ARG TARGETARCH
+
+# Install required packages (latest versions)
+RUN apk --no-cache add \
+    bash \
+    curl \
+    git \
+    gcc \
+    libc-dev \
+    libffi-dev \
+    linux-headers \
+    musl-dev \
+    openssl \
+    python3 \
+    py3-pip \
+    sudo \
+    whois \
+    p7zip \
+    less \
+    make
+
+# Configure en_US.UTF-8 Locale
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+# Define non-root user
+ARG USERNAME=devops
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Set up non-root user with sudo privileges
+RUN addgroup -g $USER_GID $USERNAME && \
+    adduser -D -u $USER_UID -G $USERNAME $USERNAME && \
+    echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
+    chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+FROM base AS linux-amd64
+ARG DOTNET_ARCH=x64
+ARG PS_ARCH=x64
+
+FROM base AS linux-arm64
+ARG DOTNET_ARCH=arm64
+ARG PS_ARCH=arm64
+
+FROM linux-${TARGETARCH} AS msft-install
+
+
+# Install PowerShell
+RUN curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
+    mkdir -p /opt/microsoft/powershell/7.2.0 && \
+    tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
+    ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
+    rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz
+
+# Install .NET Core Runtime
+RUN curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
+    mkdir -p /opt/microsoft/dotnet/3.1.32 && \
+    tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
+    rm dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz
+
+FROM msft-install AS vmware-install-arm64
+
+FROM msft-install AS vmware-install-amd64
+
+FROM vmware-install-${TARGETARCH} AS vmware-install-common
+
+# Add .NET to PATH
+ENV DOTNET_ROOT=/opt/microsoft/dotnet/3.1.32
+ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+
+# Install VMware PowerCLI 7.2
+RUN curl -LO https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip && \
+    mkdir -p /usr/local/share/powershell/Modules && \
+    pwsh -Command "Expand-Archive -Path VMware-PowerCLI-13.0.0-20829139.zip -DestinationPath /usr/local/share/powershell/Modules" && \
+    rm VMware-PowerCLI-13.0.0-20829139.zip
+
+# Install Python libraries
+RUN python3 -m pip install --no-cache-dir six psutil lxml pyopenssl
+
+# Clean up
+USER root
+RUN apk del --purge \
+    gcc \
+    libc-dev \
+    libffi-dev \
+    linux-headers \
+    musl-dev \
+    make \
+    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# Switch back to non-root user
+USER $USERNAME
+
+# Setting entrypoint to PowerShell
+ENTRYPOINT ["pwsh"]
