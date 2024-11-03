@@ -1,6 +1,6 @@
 # esxi-iso-builder based on originasl vmware-powercli
 
-VMware's PowerCLI with PowerShell Core and Python for ImageBuilder Support in Linux. For those who need to mount, edit and re-package ISO images from ImageBuilder, this container also has the appropriate system tools to do so. Published for 64-bit `x86` and `ARM` architectures.
+VMware's PowerCLI 13 with PowerShell Core and Python for ImageBuilder Support in Linux. For those who need to mount, edit and re-package ISO images from ImageBuilder, this container also has the appropriate system tools to do so. Published for 64-bit `x86` and `ARM` architectures.
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jmcombs/vmware-powercli/docker-publish.yml?logo=github)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jmcombs/vmware-powercli)](https://hub.docker.com/r/jmcombs/vmware-powercli "Click to view the image on Docker Hub")
