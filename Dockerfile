@@ -84,6 +84,8 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && rm ${PS_PACKAGE} \
 && echo /usr/bin/pwsh >> /etc/shells
 
+RUN ls -lah /usr/bin/pwsh
+
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
