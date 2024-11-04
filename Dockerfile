@@ -42,6 +42,7 @@ RUN addgroup -g $USER_GID $USERNAME && \
     adduser -D -u $USER_UID -G $USERNAME -s /usr/bin/pwsh $USERNAME && \
     echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME \
+    && echo /usr/bin/pwsh >> /etc/shells \
     && cat /etc/shells
 
 USER $USERNAME
@@ -94,8 +95,8 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 
 # Check installed versions of .NET and PowerShell
 RUN ./pwsh -Command "Write-Output \$PSVersionTable" \
-    && ["./pwsh -Command "dotnet --list-runtimes""] \
-    && ["./pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'""]
+    && pwsh -Command "dotnet --list-runtimes" \
+    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
 FROM msft-install AS vmware-install-arm64
 
