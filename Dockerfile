@@ -90,7 +90,7 @@ $RUN ls -lah /usr/bin/pwsh \
 $    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
 
 # Check installed versions of .NET and PowerShell
-RUN pwsh -Command "Write-Output \$PSVersionTable" \
+RUN ./pwsh -Command "Write-Output \$PSVersionTable" \
     && ./pwsh -Command "dotnet --list-runtimes" \
     && ./pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
