@@ -1,5 +1,5 @@
 # Use multi-stage builds for architecture-specific images
-FROM alpine:3.15 AS base
+FROM alpine:3.17 AS base
 
 # Set non-interactive mode for container build
 ENV DEBIAN_FRONTEND=noninteractive
