@@ -39,10 +39,7 @@ RUN apk --no-cache add \
     zlib \
     icu-libs \
     libc6-compat \
-    libssl3 \
-    libgdiplus
-
-
+    libssl3 
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
