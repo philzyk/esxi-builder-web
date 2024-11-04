@@ -50,11 +50,11 @@ WORKDIR /home/$USERNAME
 
 FROM base AS linux-amd64
 ARG DOTNET_ARCH=x64
-ARG PS_ARCH=x64
+ARG PS_ARCH=alpine-x64
 
 FROM base AS linux-arm64
 ARG DOTNET_ARCH=arm64
-ARG PS_ARCH=arm64
+ARG PS_ARCH=alpine-arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
