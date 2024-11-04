@@ -89,8 +89,8 @@ RUN ls -lah /bin/pwsh
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
-    && pwsh -Command "dotnet --list-runtimes" \
-    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+    && /opt/microsoft/powershell/7.2.0/pwsh -Command "dotnet --list-runtimes" \
+    && /opt/microsoft/powershell/7.2.0/pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
 FROM msft-install AS vmware-install-arm64
 
