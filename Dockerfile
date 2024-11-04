@@ -111,12 +111,10 @@ ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
 ARG DOTNET_PACKAGE_URL=https://dotnetcli.azureedge.net/dotnet/Runtime/${DOTNET_VERSION}/${DOTNET_PACKAGE}
 ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-ENV DOTNET_ROOT=$HOME/.dotnet
 ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
     && tar zxf /tmp/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
-
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_MAJOR_VERSION=7.2.0
