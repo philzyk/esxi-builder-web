@@ -55,7 +55,8 @@ ARG PS_ARCH=arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
-# Install PowerShell with error handling
+USER root
+
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
