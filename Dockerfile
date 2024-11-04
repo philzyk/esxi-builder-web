@@ -82,17 +82,17 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
 && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
 && ls -lah ${PS_INSTALL_FOLDER} \
-&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /bin/pwsh \
+&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
 && rm ${PS_PACKAGE} \
-&& echo /bin/pwsh >> /etc/shells
+&& echo /usr/bin/pwsh >> /etc/shells
 
-RUN ls -lah /bin/pwsh \
-    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
+$RUN ls -lah /usr/bin/pwsh \
+$    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
-    && /opt/microsoft/powershell/7.2.0/pwsh -Command "dotnet --list-runtimes" \
-    && /opt/microsoft/powershell/7.2.0/pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+    && ./pwsh -Command "dotnet --list-runtimes" \
+    && ./pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
 FROM msft-install AS vmware-install-arm64
 
