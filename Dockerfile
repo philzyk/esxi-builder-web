@@ -88,8 +88,7 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
-
-
+    
 FROM msft-install AS vmware-install-arm64
 
 FROM msft-install AS vmware-install-amd64
