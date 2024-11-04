@@ -37,8 +37,7 @@ RUN apk --no-cache add \
     tzdata \
     userspace-rcu \
     zlib \
-    icu-libs 
-
+    icu-libs
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
@@ -71,8 +70,6 @@ ARG PS_ARCH=alpine-arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
-USER root
-
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
@@ -83,6 +80,7 @@ ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
     && tar zxf /tmp/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
+
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_MAJOR_VERSION=7.2.0
@@ -101,10 +99,6 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && rm ${PS_PACKAGE} \
 # && echo /usr/bin/pwsh >> /etc/shells \
 &&  cat /etc/shells
-
-
-#RUN ls -lah /usr/bin/pwsh \
-#    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
