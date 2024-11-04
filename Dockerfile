@@ -81,7 +81,7 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && mkdir -p ${PS_INSTALL_FOLDER} \
 && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
 && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-&& ls -lah ${PS_INSTALL_FOLDER}
+&& ls -lah ${PS_INSTALL_FOLDER} \
 && ln -sf ${PS_INSTALL_FOLDER}/pwsh /bin/pwsh \
 && rm ${PS_PACKAGE} \
 && echo /bin/pwsh >> /etc/shells
