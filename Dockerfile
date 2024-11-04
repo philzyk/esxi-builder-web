@@ -71,18 +71,18 @@ RUN mkdir -p ${DOTNET_ROOT} \
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_MAJOR_VERSION=7.2.0
 RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
-    && PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_MAJOR_VERSION} \
-    && PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${PS_ARCH}.tar.gz \
-    && PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE} \
-    && echo "PowerShell Package: ${PS_PACKAGE}" \
-    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
-    && curl -LO ${PS_PACKAGE_URL} \
-    && mkdir -p ${PS_INSTALL_FOLDER} \
-    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
-    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    && rm ${PS_PACKAGE} \
-    && echo /usr/bin/pwsh >> /etc/shells
+&& PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_MAJOR_VERSION} \
+&& PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${PS_ARCH}.tar.gz \
+&& PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE} \
+&& echo "PowerShell Package: ${PS_PACKAGE}" \
+&& echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
+&& curl -LO ${PS_PACKAGE_URL} \
+&& mkdir -p ${PS_INSTALL_FOLDER} \
+&& tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
+&& chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+&& rm ${PS_PACKAGE} \
+&& echo /usr/bin/pwsh >> /etc/shells
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
