@@ -69,7 +69,7 @@ RUN apk --no-cache add \
     zlib \
     icu-libs \
     libc6-compat \
-    libssl3 
+    libssl3
 
 # Install glibc
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
