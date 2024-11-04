@@ -55,8 +55,8 @@ ARG PS_ARCH=arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
-
 # Install PowerShell
+USER root
 RUN curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
     mkdir -p /opt/microsoft/powershell/7.2.0 && \
     tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
