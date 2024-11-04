@@ -9,6 +9,38 @@ ARG TARGETARCH
 
 # Install required packages (latest versions)
 RUN apk --no-cache add \
+    #bash \
+    #bash-completion \
+    #curl \
+    #git \
+    #gcc \
+    #libc-dev \
+    #libffi-dev \
+    #linux-headers \
+    #musl-dev \
+    #openssl \
+    #python3 \
+    #py3-pip \
+    #sudo \
+    #whois \
+    #p7zip \
+    #less \
+    #make \
+    #ca-certificates \
+    #less \
+    #ncurses-terminfo-base \
+    #krb5-libs \
+    #libgcc \
+    #libintl \
+    #libssl1.1 \
+    #libstdc++ \
+    #tzdata \
+    #userspace-rcu \
+    #zlib \
+    #icu-libs \
+    #libc6-compat \
+    #libssl3 
+
     bash \
     bash-completion \
     curl \
@@ -18,7 +50,6 @@ RUN apk --no-cache add \
     libffi-dev \
     linux-headers \
     musl-dev \
-   # openssl \
     python3 \
     py3-pip \
     sudo \
@@ -27,7 +58,6 @@ RUN apk --no-cache add \
     less \
     make \
     ca-certificates \
-    less \
     ncurses-terminfo-base \
     krb5-libs \
     libgcc \
@@ -39,8 +69,7 @@ RUN apk --no-cache add \
     zlib \
     icu-libs \
     libc6-compat \
-    libssl3 \
-    alpine-pkg-glibc
+    libssl3 
 
 
 # Configure en_US.UTF-8 Locale
