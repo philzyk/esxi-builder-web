@@ -38,7 +38,10 @@ RUN apk --no-cache add \
     userspace-rcu \
     zlib \
     icu-libs \
-    libc6-compat
+    libc6-compat \
+    libssl3 \
+    libgdiplus
+
 
 
 # Configure en_US.UTF-8 Locale
