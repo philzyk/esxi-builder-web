@@ -56,28 +56,38 @@ ARG PS_ARCH=arm64
 FROM linux-${TARGETARCH} AS msft-install
 
 # Install PowerShell with error handling
-USER root
-RUN echo "Downloading PowerShell for ${TARGETARCH}..." && \
-    curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
-    if [ -s powershell-7.2.0-linux-${TARGETARCH}.tar.gz ]; then \
-        mkdir -p /opt/microsoft/powershell/7.2.0 && \
-        tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
-        ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
-        rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz; \
-    else \
-        echo "PowerShell download failed. Please check URL and network connectivity." && exit 1; \
-    fi
+# Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
+ARG DOTNET_VERSION=3.1.32
+ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
+ARG DOTNET_PACKAGE_URL=https://dotnetcli.azureedge.net/dotnet/Runtime/${DOTNET_VERSION}/${DOTNET_PACKAGE}
+ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
+ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
+RUN mkdir -p ${DOTNET_ROOT} \
+    && tar zxf /tmp/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
+    && rm /tmp/${DOTNET_PACKAGE}
 
-# Install .NET Core 3.1.32 Runtime
-RUN echo "Downloading .NET Core 3.1.32 Runtime for ${TARGETARCH}..." && \
-    curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
-    if [ -s dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz ]; then \
-        mkdir -p /opt/microsoft/dotnet/3.1.32 && \
-        tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
-        rm dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz; \
-    else \
-        echo ".NET Core download failed. Please check URL and network connectivity." && exit 1; \
-    fi
+# PowerShell Core 7.2 (LTS) - forcing to install exact version
+ENV PS_MAJOR_VERSION=7.2.0
+RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
+    && PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_MAJOR_VERSION} \
+    && PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${PS_ARCH}.tar.gz \
+    && PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE} \
+    && echo "PowerShell Package: ${PS_PACKAGE}" \
+    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
+    && curl -LO ${PS_PACKAGE_URL} \
+    && mkdir -p ${PS_INSTALL_FOLDER} \
+    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && rm ${PS_PACKAGE} \
+    && echo /usr/bin/pwsh >> /etc/shells
+
+# Check installed versions of .NET and PowerShell
+RUN pwsh -Command "Write-Output \$PSVersionTable" \
+    && pwsh -Command "dotnet --list-runtimes" \
+    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+
 
 FROM msft-install AS vmware-install-arm64
 
