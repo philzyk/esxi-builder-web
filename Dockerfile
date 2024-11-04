@@ -18,14 +18,27 @@ RUN apk --no-cache add \
     libffi-dev \
     linux-headers \
     musl-dev \
-    openssl \
+   # openssl \
     python3 \
     py3-pip \
     sudo \
     whois \
     p7zip \
     less \
-    make
+    make \
+    ca-certificates \
+    less \
+    ncurses-terminfo-base \
+    krb5-libs \
+    libgcc \
+    libintl \
+    libssl1.1 \
+    libstdc++ \
+    tzdata \
+    userspace-rcu \
+    zlib \
+    icu-libs 
+
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
