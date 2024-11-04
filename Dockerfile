@@ -85,7 +85,8 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && rm ${PS_PACKAGE} \
 && echo /bin/pwsh >> /etc/shells
 
-RUN ls -lah /bin/pwsh
+RUN ls -lah /bin/pwsh \
+    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
