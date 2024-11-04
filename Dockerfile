@@ -36,9 +36,9 @@ ARG USERNAME=devops
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Set up non-root user with sudo privileges
-RUN addgroup -g $USER_GID $USERNAME && \
-    adduser -D -u $USER_UID -G $USERNAME $USERNAME && \
+# Set up non-root user with sudo privilege
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID --shell /usr/bin/pwsh --create-home $USERNAME && \
     echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
