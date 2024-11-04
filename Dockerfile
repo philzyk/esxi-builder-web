@@ -38,7 +38,7 @@ ARG USER_GID=$USER_UID
 
 # Set up non-root user with sudo privilege
 RUN addgroup -g $USER_GID $USERNAME && \
-    useradd --uid $USER_UID --gid $USER_GID --shell /usr/bin/pwsh --create-home $USERNAME && \
+    adduser -D -u $USER_UID -G $USERNAME -s /usr/bin/pwsh $USERNAME && \
     echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
