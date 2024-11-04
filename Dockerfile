@@ -56,7 +56,7 @@ ARG PS_ARCH=arm64
 FROM linux-${TARGETARCH} AS msft-install
 
 USER root
-ENTRYPOINT ["/bin/bash"]
+
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
@@ -67,7 +67,8 @@ ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
     && tar zxf /tmp/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
-
+    
+ENTRYPOINT ["/bin/sh"]
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_MAJOR_VERSION=7.2.0
 RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
@@ -87,6 +88,7 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 RUN ls -lah /usr/bin/pwsh
 
 # Check installed versions of .NET and PowerShell
+ENTRYPOINT ["/usr/bin/pwsh"]
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
@@ -101,6 +103,7 @@ FROM vmware-install-${TARGETARCH} AS vmware-install-common
 ENV DOTNET_ROOT=/opt/microsoft/dotnet/3.1.32
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
+ENTRYPOINT ["/bin/sh"]
 # Install VMware PowerCLI 7.2
 RUN curl -LO https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip && \
     mkdir -p /usr/local/share/powershell/Modules && \
