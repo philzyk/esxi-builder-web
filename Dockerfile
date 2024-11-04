@@ -10,6 +10,7 @@ ARG TARGETARCH
 # Install required packages (latest versions)
 RUN apk --no-cache add \
     bash \
+    bash-completion \
     curl \
     git \
     gcc \
@@ -40,7 +41,8 @@ ARG USER_GID=$USER_UID
 RUN addgroup -g $USER_GID $USERNAME && \
     adduser -D -u $USER_UID -G $USERNAME -s /usr/bin/pwsh $USERNAME && \
     echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME
+    chmod 0440 /etc/sudoers.d/$USERNAME \
+    && cat /etc/shells
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
@@ -68,7 +70,6 @@ RUN mkdir -p ${DOTNET_ROOT} \
     && tar zxf /tmp/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
     
-ENTRYPOINT ["/bin/sh"]
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_MAJOR_VERSION=7.2.0
 RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
@@ -84,15 +85,17 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && ls -lah ${PS_INSTALL_FOLDER} \
 && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
 && rm ${PS_PACKAGE} \
-&& echo /usr/bin/pwsh >> /etc/shells
+&& echo /usr/bin/pwsh >> /etc/shells \
+&&  cat /etc/shells
+
 
 #RUN ls -lah /usr/bin/pwsh \
 #    && ls -lah ${PS_INSTALL_FOLDER}/pwsh
 
 # Check installed versions of .NET and PowerShell
 RUN ./pwsh -Command "Write-Output \$PSVersionTable" \
-    && ./pwsh -Command "dotnet --list-runtimes" \
-    && ./pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+    && ["./pwsh -Command "dotnet --list-runtimes""] \
+    && ["./pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'""]
     
 FROM msft-install AS vmware-install-arm64
 
