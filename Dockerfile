@@ -55,19 +55,29 @@ ARG PS_ARCH=arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
-# Install PowerShell
+# Install PowerShell with error handling
 USER root
-RUN curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
-    mkdir -p /opt/microsoft/powershell/7.2.0 && \
-    tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
-    ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
-    rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz
+RUN echo "Downloading PowerShell for ${TARGETARCH}..." && \
+    curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
+    if [ -s powershell-7.2.0-linux-${TARGETARCH}.tar.gz ]; then \
+        mkdir -p /opt/microsoft/powershell/7.2.0 && \
+        tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
+        ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
+        rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz; \
+    else \
+        echo "PowerShell download failed. Please check URL and network connectivity." && exit 1; \
+    fi
 
 # Install .NET Core 3.1.32 Runtime
-RUN curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
-    mkdir -p /opt/microsoft/dotnet/3.1.32 && \
-    tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
-    rm dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz
+RUN echo "Downloading .NET Core 3.1.32 Runtime for ${TARGETARCH}..." && \
+    curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
+    if [ -s dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz ]; then \
+        mkdir -p /opt/microsoft/dotnet/3.1.32 && \
+        tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
+        rm dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz; \
+    else \
+        echo ".NET Core download failed. Please check URL and network connectivity." && exit 1; \
+    fi
 
 FROM msft-install AS vmware-install-arm64
 
