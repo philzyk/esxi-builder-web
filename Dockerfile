@@ -81,14 +81,13 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && mkdir -p ${PS_INSTALL_FOLDER} \
 && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
 && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /bin/pwsh \
 && rm ${PS_PACKAGE} \
-&& echo /usr/bin/pwsh >> /etc/shells
+&& echo /bin/pwsh >> /etc/shells
 
 RUN ls -lah /usr/bin/pwsh
 
 # Check installed versions of .NET and PowerShell
-ENTRYPOINT ["/usr/bin/pwsh"]
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
@@ -105,13 +104,23 @@ ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
 ENTRYPOINT ["/bin/sh"]
 # Install VMware PowerCLI 7.2
-RUN curl -LO https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip && \
-    mkdir -p /usr/local/share/powershell/Modules && \
-    pwsh -Command "Expand-Archive -Path VMware-PowerCLI-13.0.0-20829139.zip -DestinationPath /usr/local/share/powershell/Modules" && \
-    rm VMware-PowerCLI-13.0.0-20829139.zip
+ARG POWERCLIURL=https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip
+ARG POWERCLI_PATH="/usr/local/share/powershell/Modules"
+ADD ${POWERCLIURL} /tmp/VMware-PowerCLI-13.0.0-20829139.zip
+RUN mkdir -p $POWERCLI_PATH \
+    && pwsh -Command "Expand-Archive -Path /tmp/VMware-PowerCLI-13.0.0-20829139.zip -DestinationPath $POWERCLI_PATH" \
+    && rm /tmp/VMware-PowerCLI-13.0.0-20829139.zip 
 
 # Install Python libraries
 RUN python3 -m pip install --no-cache-dir six psutil lxml pyopenssl
+
+# Setting up and "import" VMware.PowerCLI to $USERNAME
+ARG VMWARECEIP=false
+RUN pwsh -Command "Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP \$${VMWARECEIP} -Confirm:\$false" \
+    && pwsh -Command "Set-PowerCLIConfiguration -PythonPath /usr/bin/python3.7 -Scope User -Confirm:\$false"
+
+# Installing ESXi-Customizer-PS from https://v-front.de
+RUN git clone https://github.com/VFrontDe-Org/ESXi-Customizer-PS /home/$USERNAME/files/ESXi-Customizer-PS
 
 # Clean up
 USER root
