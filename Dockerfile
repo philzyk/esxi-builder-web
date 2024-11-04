@@ -63,7 +63,7 @@ RUN curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/p
     ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
     rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz
 
-# Install .NET Core Runtime
+# Install .NET Core 3.1.32 Runtime
 RUN curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
     mkdir -p /opt/microsoft/dotnet/3.1.32 && \
     tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
