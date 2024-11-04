@@ -70,6 +70,8 @@ ARG PS_ARCH=alpine-arm64
 
 FROM linux-${TARGETARCH} AS msft-install
 
+USER root
+
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
@@ -100,6 +102,7 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 # && echo /usr/bin/pwsh >> /etc/shells \
 &&  cat /etc/shells
 
+USER $USERNAME
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
@@ -111,11 +114,7 @@ FROM msft-install AS vmware-install-amd64
 
 FROM vmware-install-${TARGETARCH} AS vmware-install-common
 
-# Add .NET to PATH
-ENV DOTNET_ROOT=/opt/microsoft/dotnet/3.1.32
-ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-
-ENTRYPOINT ["/bin/sh"]
+USER root
 # Install VMware PowerCLI 7.2
 ARG POWERCLIURL=https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip
 ARG POWERCLI_PATH="/usr/local/share/powershell/Modules"
@@ -127,16 +126,19 @@ RUN mkdir -p $POWERCLI_PATH \
 # Install Python libraries
 RUN python3 -m pip install --no-cache-dir six psutil lxml pyopenssl
 
+USER $USERNAME
 # Setting up and "import" VMware.PowerCLI to $USERNAME
 ARG VMWARECEIP=false
 RUN pwsh -Command "Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP \$${VMWARECEIP} -Confirm:\$false" \
     && pwsh -Command "Set-PowerCLIConfiguration -PythonPath /usr/bin/python3.7 -Scope User -Confirm:\$false"
 
-# Installing ESXi-Customizer-PS from https://v-front.de
-RUN git clone https://github.com/VFrontDe-Org/ESXi-Customizer-PS /home/$USERNAME/files/ESXi-Customizer-PS
 
 # Clean up
 USER root
+
+# Installing ESXi-Customizer-PS from https://v-front.de
+RUN git clone https://github.com/VFrontDe-Org/ESXi-Customizer-PS /home/$USERNAME/files/ESXi-Customizer-PS
+
 RUN apk del --purge \
     gcc \
     libc-dev \
