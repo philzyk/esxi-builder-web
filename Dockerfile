@@ -135,6 +135,9 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 &&  cat /etc/shells
 
 USER $USERNAME
+ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
+ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
