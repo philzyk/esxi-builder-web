@@ -37,7 +37,9 @@ RUN apk --no-cache add \
     tzdata \
     userspace-rcu \
     zlib \
-    icu-libs
+    icu-libs \
+    libc6-compat
+
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
