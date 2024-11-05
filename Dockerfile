@@ -101,26 +101,21 @@ USER $USERNAME
 WORKDIR /home/$USERNAME
 
 FROM base AS linux-amd64
-ARG DOTNET_ARCH=x64
-ARG PS_ARCH=alpine-x64
+ARG ARCH=x64
 ARG UID_URL=e94c26b7-6ac0-46b9-81f1-e008ce8348cb/41d57ffacf3e151de8039ec3cd007a68
 
-
 FROM base AS linux-arm64
-ARG DOTNET_ARCH=arm64
-ARG PS_ARCH=alpine-arm64
+ARG ARCH=arm64
 ARG UID_URL=2672b266-880f-4ec1-ab89-bcd235c59193/d37f0755df26313e7a7bbf6dbcf9184e
 
 FROM linux-${TARGETARCH} AS msft-install
 
-USER root
-
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
-ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${DOTNET_ARCH}.tar.gz
+ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ARG DOTNET_PACKAGE_URL=https://dotnetcli.azureedge.net/dotnet/Runtime/${DOTNET_VERSION}/${DOTNET_PACKAGE}
-ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${DOTNET_ARCH}.tar.gz
-ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
+ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
+ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
@@ -128,10 +123,11 @@ RUN mkdir -p ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
-ENV PS_MAJOR_VERSION=7.2.0
+ENV PS_VERSION=7.2
+ENV PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v${PS_MAJOR_VERSION}' | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/')
 RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
-&& PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_MAJOR_VERSION} \
-&& PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${PS_ARCH}.tar.gz \
+&& PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
+&& PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz \
 && PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE} \
 && echo "PowerShell Package: ${PS_PACKAGE}" \
 && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
@@ -145,10 +141,6 @@ RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 # && echo /usr/bin/pwsh >> /etc/shells \
 &&  cat /etc/shells
 
-USER $USERNAME
-ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
-ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
@@ -160,10 +152,9 @@ FROM msft-install AS vmware-install-amd64
 
 FROM vmware-install-${TARGETARCH} AS vmware-install-common
 
-USER root
 # Install VMware PowerCLI 7.2
 ARG POWERCLIURL=https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip
-ARG POWERCLI_PATH="/usr/local/share/powershell/Modules"
+ARG POWERCLI_PATH="/home/${USERNAME}/powershell/Modules"
 ADD ${POWERCLIURL} /tmp/VMware-PowerCLI-13.0.0-20829139.zip
 RUN mkdir -p $POWERCLI_PATH \
     && pwsh -Command "Expand-Archive -Path /tmp/VMware-PowerCLI-13.0.0-20829139.zip -DestinationPath $POWERCLI_PATH" \
@@ -178,13 +169,11 @@ ARG VMWARECEIP=false
 RUN pwsh -Command "Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP \$${VMWARECEIP} -Confirm:\$false" \
     && pwsh -Command "Set-PowerCLIConfiguration -PythonPath /usr/bin/python3.7 -Scope User -Confirm:\$false"
 
-
-# Clean up
-USER root
-
 # Installing ESXi-Customizer-PS from https://v-front.de
 RUN git clone https://github.com/VFrontDe-Org/ESXi-Customizer-PS /home/$USERNAME/files/ESXi-Customizer-PS
 
+# Clean up
+USER root
 RUN apk del --purge \
     gcc \
     libc-dev \
