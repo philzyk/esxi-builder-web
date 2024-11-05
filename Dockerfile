@@ -137,9 +137,16 @@ RUN pwsh -Command "Write-Output \$PSVersionTable" \
     
 
 
-RUN pwsh -Command "Set-PSRepository -Name PSGallery -InstallationPolicy Trusted" \
+RUN pwsh -Command "Register-PSRepository -Default" \
+    && pwsh -Command "Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted" \
+    && pwsh -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12" \
     && pwsh -Command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force" \
     && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force"
+
+RUN pwsh -Command "Install-Module -Name PowerShellGet -Force -SkipPublisherCheck" \
+    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
+
+RUN pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
 
     
 FROM msft-install AS vmware-install-arm64
