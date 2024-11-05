@@ -49,7 +49,7 @@ RUN apk --no-cache add \
     libc-dev \
     libffi-dev \
     linux-headers \
-    musl-dev \
+    #musl-dev \
     python3 \
     py3-pip \
     sudo \
@@ -76,12 +76,12 @@ RUN apk --no-cache add \
 
 
 # Install glibc
-#RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-#    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
-#    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-#    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-#    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-#    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
+RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
+    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
