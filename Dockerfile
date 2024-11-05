@@ -1,106 +1,61 @@
 # Use multi-stage builds for architecture-specific images
-FROM alpine:3.15 AS base
+# Use a base image for Windows Server Core
+FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS base
 
-# Set non-interactive mode for container build
-ENV DEBIAN_FRONTEND=noninteractive
+# Set architecture-specific variables
+ARG PYTHON_VERSION=3.7.9
 
-# Dockerfile ARG variables for architecture
-ARG TARGETARCH
+# Install PowerShell, Python, and PowerCLI
+RUN powershell -Command \
+    # Install Windows features
+    Install-WindowsFeature -Name Web-Server, Web-WebServer, Net-Framework-Features, Net-Framework-Core, NET-Framework-4.8-Features; \
+    # Install Chocolatey (Package manager)
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')); \
+    # Install Python 3.7.9
+    choco install python --version=$env:PYTHON_VERSION -y; \
+    # Install PowerShell Core
+    choco install pwsh -y; \
+    # Clean up temporary files
+    Remove-Item -Recurse -Force C:\Temp\*
 
-# Install required packages (latest versions)
-RUN apk --no-cache add \
-    bash \
-    curl \
-    git \
-    gcc \
-    libc-dev \
-    libffi-dev \
-    linux-headers \
-    musl-dev \
-    openssl \
-    python3 \
-    py3-pip \
-    sudo \
-    whois \
-    p7zip \
-    less \
-    make
+# Set environment variables for Python
+ENV PYTHON_HOME="C:\Users\ContainerUser\AppData\Local\Programs\Python\Python37"
+ENV PATH="$PYTHON_HOME;${PYTHON_HOME}\Scripts;${PATH}"
 
-# Configure en_US.UTF-8 Locale
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8
+# Install necessary Python packages
+RUN powershell -Command \
+    # Install the required Python packages using pip
+    Start-Process -FilePath "$PYTHON_HOME\Scripts\pip3.7.exe" -ArgumentList "install", "six", "psutil", "lxml", "pyopenssl" -NoNewWindow -Wait
 
-# Define non-root user
-ARG USERNAME=devops
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+# Install PowerCLI
+RUN powershell -Command \
+    # Install PowerCLI module
+    Install-Module -Name VMware.PowerCLI -AllowClobber -Scope AllUsers -Force -SkipPublisherCheck; \
+    # Configure PowerCLI for running without user prompt
+    Set-PowerCLIConfiguration -Scope User -InvalidCertificateAction Ignore -Confirm:$false; \
+    # Clean up the PowerShell session
+    Remove-Module VMware.PowerCLI
 
-# Set up non-root user with sudo privileges
-RUN addgroup -g $USER_GID $USERNAME && \
-    adduser -D -u $USER_UID -G $USERNAME $USERNAME && \
-    echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME
+# Set environment variables for PowerShell
+ENV PSModulePath="C:\Program Files\PowerShell\Modules;$env:PSModulePath"
+ENV PATH="C:\Program Files\PowerShell\7;$env:PATH"
 
-USER $USERNAME
-WORKDIR /home/$USERNAME
+# Verify Python and PowerShell installation
+RUN python --version && pwsh --version
 
-FROM base AS linux-amd64
-ARG DOTNET_ARCH=x64
-ARG PS_ARCH=x64
+# Set default shell to PowerShell Core
+SHELL ["pwsh", "-Command"]
 
-FROM base AS linux-arm64
-ARG DOTNET_ARCH=arm64
-ARG PS_ARCH=arm64
+# Set working directory
+WORKDIR /app
 
-FROM linux-${TARGETARCH} AS msft-install
+# Optional: Copy your project files into the container
+COPY . /app
 
+# Expose any required ports (e.g., for web apps or APIs)
+EXPOSE 80
 
-# Install PowerShell
-RUN curl -LO https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/powershell-7.2.0-linux-${TARGETARCH}.tar.gz && \
-    mkdir -p /opt/microsoft/powershell/7.2.0 && \
-    tar zxf powershell-7.2.0-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/powershell/7.2.0 && \
-    ln -s /opt/microsoft/powershell/7.2.0/pwsh /usr/bin/pwsh && \
-    rm powershell-7.2.0-linux-${TARGETARCH}.tar.gz
-
-# Install .NET Core Runtime
-RUN curl -LO https://dotnetcli.azureedge.net/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz && \
-    mkdir -p /opt/microsoft/dotnet/3.1.32 && \
-    tar zxf dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz -C /opt/microsoft/dotnet/3.1.32 && \
-    rm dotnet-runtime-3.1.32-linux-${TARGETARCH}.tar.gz
-
-FROM msft-install AS vmware-install-arm64
-
-FROM msft-install AS vmware-install-amd64
-
-FROM vmware-install-${TARGETARCH} AS vmware-install-common
-
-# Add .NET to PATH
-ENV DOTNET_ROOT=/opt/microsoft/dotnet/3.1.32
-ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-
-# Install VMware PowerCLI 7.2
-RUN curl -LO https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip && \
-    mkdir -p /usr/local/share/powershell/Modules && \
-    pwsh -Command "Expand-Archive -Path VMware-PowerCLI-13.0.0-20829139.zip -DestinationPath /usr/local/share/powershell/Modules" && \
-    rm VMware-PowerCLI-13.0.0-20829139.zip
-
-# Install Python libraries
-RUN python3 -m pip install --no-cache-dir six psutil lxml pyopenssl
-
-# Clean up
-USER root
-RUN apk del --purge \
-    gcc \
-    libc-dev \
-    libffi-dev \
-    linux-headers \
-    musl-dev \
-    make \
-    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
-
-# Switch back to non-root user
-USER $USERNAME
-
-# Setting entrypoint to PowerShell
-ENTRYPOINT ["pwsh"]
+# Set the command to run when the container starts
+CMD ["pwsh"]
