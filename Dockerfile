@@ -103,10 +103,13 @@ WORKDIR /home/$USERNAME
 FROM base AS linux-amd64
 ARG DOTNET_ARCH=x64
 ARG PS_ARCH=alpine-x64
+ARG UID_URL=e94c26b7-6ac0-46b9-81f1-e008ce8348cb/41d57ffacf3e151de8039ec3cd007a68
+
 
 FROM base AS linux-arm64
 ARG DOTNET_ARCH=arm64
 ARG PS_ARCH=alpine-arm64
+ARG UID_URL=2672b266-880f-4ec1-ab89-bcd235c59193/d37f0755df26313e7a7bbf6dbcf9184e
 
 FROM linux-${TARGETARCH} AS msft-install
 
@@ -114,8 +117,9 @@ USER root
 
 # Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
-ARG DOTNET_PACKAGE=dotnet-runtime-${DOTNET_VERSION}-linux-${DOTNET_ARCH}.tar.gz
+ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${DOTNET_ARCH}.tar.gz
 ARG DOTNET_PACKAGE_URL=https://dotnetcli.azureedge.net/dotnet/Runtime/${DOTNET_VERSION}/${DOTNET_PACKAGE}
+ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${DOTNET_ARCH}.tar.gz
 ENV DOTNET_ROOT=/opt/microsoft/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 ADD ${DOTNET_PACKAGE_URL} /tmp/${DOTNET_PACKAGE}
