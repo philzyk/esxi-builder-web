@@ -120,7 +120,7 @@ ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/$
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 RUN mkdir -p ${DOTNET_ROOT} \
-    && curl -s ${DOTNET_PACKAGE_URL} \
+    && curl -LO ${DOTNET_PACKAGE_URL} \
     && tar zxf ${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm ${DOTNET_PACKAGE}
     
