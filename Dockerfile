@@ -99,8 +99,6 @@ RUN addgroup -g $USER_GID $USERNAME && \
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
-ARG USER_TMP=${WORKDIR}/tmp
-RUN mkdir -p ${USER_TMP}
 
 # Setting ARCH ARGs for linux-amd64 & linux-arm64
 FROM base AS linux-amd64
@@ -120,10 +118,10 @@ ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.g
 ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-ADD ${DOTNET_PACKAGE_URL} ${USER_TMP}/${DOTNET_PACKAGE}
+ADD ${DOTNET_PACKAGE_URL} ${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
-    && tar zxf ${USER_TMP}/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
-    && rm ${USER_TMP}/${DOTNET_PACKAGE}
+    && tar zxf ${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
+    && rm ${DOTNET_PACKAGE}
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
