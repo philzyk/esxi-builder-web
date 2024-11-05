@@ -127,6 +127,7 @@ RUN mkdir -p ${DOTNET_ROOT} \
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
 ENV PS_VERSION=7.2
+ENV PATH=$PATH:PS_INSTALL_FOLDER
 RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
     && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
     && PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
@@ -138,8 +139,7 @@ RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShe
     && mkdir -p ${PS_INSTALL_FOLDER} \
     && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /home/${USERNAME}/pwsh \  # Create link in the user's home directory
-    && echo 'export PATH="$HOME:$PATH"' >> /home/${USERNAME}/.bashrc \  # Add user's home to PATH
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /home/${USERNAME}/pwsh \
     && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
