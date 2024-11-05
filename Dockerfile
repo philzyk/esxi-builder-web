@@ -38,7 +38,8 @@ RUN apk --no-cache add \
     icu-libs \
     libc6-compat \
     libssl3 \
-    powershell
+    powershell \
+    gnupg
 
 # .NET dependencies
 # python dependencies
@@ -134,6 +135,13 @@ RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
+RUN pwsh -Command " \
+    Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; \
+    if (-not (Get-Module -ListAvailable -Name PowerShellGet)) { \
+        Install-Module -Name PowerShellGet -Force -Scope AllUsers; \
+    }; \
+    Install-Module -Name Microsoft.PowerShell.Archive -Force -Scope AllUsers"
+    
 FROM msft-install AS vmware-install-arm64
 
 FROM msft-install AS vmware-install-amd64
@@ -142,8 +150,6 @@ FROM vmware-install-${TARGETARCH} AS vmware-install-common
 
 # Install VMware PowerCLI 7.2
 USER $USERNAME
-RUN pwsh -Command "Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module -Name PowerShellGet -Force -Scope AllUsers"
-RUN pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive"
 RUN pwsh -Command "Import-Module Microsoft.PowerShell.Archive"
 ARG POWERCLIURL=https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip
 ARG POWERCLI_PATH="/home/${USERNAME}/powershell/Modules"
