@@ -135,6 +135,8 @@ RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'" \
     && pwsh -Command "Get-Module -ListAvailable"
+
+RUN ls -lah /usr/lib/powershell && ls -lah /usr/lib/powershell/Modules
     
 RUN pwsh -Command "Register-PSRepository -Default" \
     && pwsh -Command "Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted" \
