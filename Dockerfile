@@ -134,6 +134,11 @@ FROM linux-${TARGETARCH} AS msft-install
 #RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
 #    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
+#export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH
+ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
+#export DOTNET_ROOT=$(dirname $(realpath $(which dotnet)))
+ENV DOTNET_ROOT="/root/.dotnet"
+
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
 ENV PS_VERSION=7.2
