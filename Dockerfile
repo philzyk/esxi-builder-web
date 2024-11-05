@@ -133,8 +133,8 @@ FROM linux-${TARGETARCH} AS msft-install
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
-    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"; \
-    'Get-Module -ListAvailable'
+    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'" \
+    && pwsh -Command "Get-Module -ListAvailable"
     
 RUN pwsh -Command "Register-PSRepository -Default" \
     && pwsh -Command "Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted" \
