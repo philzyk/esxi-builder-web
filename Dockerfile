@@ -138,7 +138,8 @@ RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShe
     && mkdir -p ${PS_INSTALL_FOLDER} \
     && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /home/${USERNAME}/pwsh \  # Create link in the user's home directory
+    && echo 'export PATH="$HOME:$PATH"' >> /home/${USERNAME}/.bashrc \  # Add user's home to PATH
     && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
