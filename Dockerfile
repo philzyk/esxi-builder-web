@@ -99,7 +99,7 @@ RUN addgroup -g $USER_GID $USERNAME && \
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
-ARG USER_TMP=WORKDIR/tmp
+ARG USER_TMP=${WORKDIR}/tmp
 
 
 FROM base AS linux-amd64
