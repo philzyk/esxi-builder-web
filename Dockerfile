@@ -153,9 +153,9 @@ RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShe
     && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
-RUN /home/${USERNAME}/pwsh -Command "Write-Output \$PSVersionTable" \
-    && /home/${USERNAME}/pwsh -Command "dotnet --list-runtimes" \
-    && /home/${USERNAME}/pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+RUN pwsh -Command "Write-Output \$PSVersionTable" \
+    && pwsh -Command "dotnet --list-runtimes" \
+    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
 FROM msft-install AS vmware-install-arm64
 
