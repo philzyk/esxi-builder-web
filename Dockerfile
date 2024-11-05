@@ -119,7 +119,7 @@ ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
-ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$HOME/.dotnet
 RUN mkdir -p ${DOTNET_ROOT} \
     && curl -LO ${DOTNET_PACKAGE_URL} \
     && tar zxf ${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
