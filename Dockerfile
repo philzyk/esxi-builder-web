@@ -69,7 +69,9 @@ RUN apk --no-cache add \
     zlib \
     icu-libs \
     libc6-compat \
-    libssl3  #\
+    libssl3 \
+    powershell
+
     #aspnetcore6-runtime
 
 # .NET dependencies
@@ -77,12 +79,12 @@ RUN apk --no-cache add \
 
 
 # Install glibc
-RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
-    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
+#RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+#    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
+#    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+#    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+#    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+#    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
 
 
 # Configure en_US.UTF-8 Locale
@@ -132,34 +134,34 @@ FROM linux-${TARGETARCH} AS msft-install
 #    && rm ${DOTNET_PACKAGE}
 
 # Install .NET 6
-RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
-    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+#RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
+#    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 #export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH
 #ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
 #export DOTNET_ROOT=$(dirname $(realpath $(which dotnet)))
 #ENV DOTNET_ROOT="/root/.dotnet"
 
-ENV DOTNET_ROOT=/usr/share/powershell/7.2.24
+#ENV DOTNET_ROOT=/usr/share/powershell/7.2.24
 
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
-ENV PS_VERSION=7.2
-ENV PS_INSTALL_FOLDER=/usr/share/powershell/${PS_VERSION}
-ENV PATH="$PATH:$PS_INSTALL_FOLDER"
-RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
-    && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
-    && PS_INSTALL_FOLDER=/usr/share/powershell/${PS_MAJOR_VERSION} \
-    && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
-    && PS_PACKAGE_URL="https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE}" \
-    && echo "PowerShell Package: ${PS_PACKAGE}" \
-    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
-    && curl -LO ${PS_PACKAGE_URL} \
-    && mkdir -p ${PS_INSTALL_FOLDER} \
-    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
-    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    && rm ${PS_PACKAGE}
+#ENV PS_VERSION=7.2
+#ENV PS_INSTALL_FOLDER=/usr/share/powershell/${PS_VERSION}
+#ENV PATH="$PATH:$PS_INSTALL_FOLDER"
+#RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
+#    && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
+#    && PS_INSTALL_FOLDER=/usr/share/powershell/${PS_MAJOR_VERSION} \
+#    && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
+#    && PS_PACKAGE_URL="https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE}" \
+#    && echo "PowerShell Package: ${PS_PACKAGE}" \
+#    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
+#    && curl -LO ${PS_PACKAGE_URL} \
+#    && mkdir -p ${PS_INSTALL_FOLDER} \
+#    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
+#    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+#    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+#    && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
