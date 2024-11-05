@@ -49,7 +49,7 @@ RUN apk --no-cache add \
     libc-dev \
     libffi-dev \
     linux-headers \
-    #musl-dev \
+    musl-dev \
     python3 \
     py3-pip \
     sudo \
@@ -69,19 +69,20 @@ RUN apk --no-cache add \
     zlib \
     icu-libs \
     libc6-compat \
-    libssl3
+    libssl3\
+    aspnetcore6-runtime
 
 # .NET dependencies
 # python dependencies
 
 
 # Install glibc
-RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
-    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
-    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
+#RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+#    ALPINE_GLIBC_PACKAGE_VERSION="2.35-r0" && \
+#    curl -Lo /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+#    curl -Lo /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk ${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+#    apk add --force-overwrite --no-cache /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk && \
+#    rm /tmp/glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk
 
 # Configure en_US.UTF-8 Locale
 ENV LANG=en_US.UTF-8 \
@@ -130,8 +131,8 @@ FROM linux-${TARGETARCH} AS msft-install
 #    && rm ${DOTNET_PACKAGE}
 
 # Install .NET 6
-RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
-    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+#RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
+#    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
