@@ -38,8 +38,9 @@ RUN apk --no-cache add \
     icu-libs \
     libc6-compat \
     libssl3 \
-    powershell \
-    gnupg
+    #powershell \
+    gnupg \
+    libpsl-native
 
 # .NET dependencies
 # python dependencies
@@ -101,8 +102,8 @@ FROM linux-${TARGETARCH} AS msft-install
 #    && rm ${DOTNET_PACKAGE}
 
 # Install .NET 6
-#RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
-#    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Quality preview -Channel 6.0 -InstallDir /usr/share/dotnet \
+   && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 #export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH
 #ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
@@ -113,22 +114,22 @@ FROM linux-${TARGETARCH} AS msft-install
 
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
-#ENV PS_VERSION=7.2
-#ENV PS_INSTALL_FOLDER=/usr/share/powershell/${PS_VERSION}
-#ENV PATH="$PATH:$PS_INSTALL_FOLDER"
-#RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
-#    && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
-#    && PS_INSTALL_FOLDER=/usr/share/powershell/${PS_MAJOR_VERSION} \
-#    && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
-#    && PS_PACKAGE_URL="https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE}" \
-#    && echo "PowerShell Package: ${PS_PACKAGE}" \
-#    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
-#    && curl -LO ${PS_PACKAGE_URL} \
-#    && mkdir -p ${PS_INSTALL_FOLDER} \
-#    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
-#    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-#    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-#    && rm ${PS_PACKAGE}
+ENV PS_VERSION=7.2
+ENV PS_INSTALL_FOLDER=/usr/share/powershell/${PS_VERSION}
+ENV PATH="$PATH:$PS_INSTALL_FOLDER"
+RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
+    && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
+    && PS_INSTALL_FOLDER=/usr/share/powershell/${PS_MAJOR_VERSION} \
+    && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
+    && PS_PACKAGE_URL="https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE}" \
+    && echo "PowerShell Package: ${PS_PACKAGE}" \
+    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
+    && curl -LO ${PS_PACKAGE_URL} \
+    && mkdir -p ${PS_INSTALL_FOLDER} \
+    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
@@ -136,18 +137,18 @@ RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'" \
     && pwsh -Command "Get-Module -ListAvailable"
 
-RUN ls -lah /usr/lib/powershell && ls -lah /usr/lib/powershell/Modules
+#RUN ls -lah /usr/lib/powershell && ls -lah /usr/lib/powershell/Modules
     
-RUN pwsh -Command "Register-PSRepository -Default" \
-    && pwsh -Command "Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted" \
-    && pwsh -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12" \
-    && pwsh -Command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force" \
-    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force"
+#RUN pwsh -Command "Register-PSRepository -Default" \
+#    && pwsh -Command "Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted" \
+#    && pwsh -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12" \
+#    && pwsh -Command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force" \
+#    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force"
 
-RUN pwsh -Command "Install-Module -Name PowerShellGet -Force -SkipPublisherCheck" \
-    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
+#RUN pwsh -Command "Install-Module -Name PowerShellGet -Force -SkipPublisherCheck" \
+#    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
 
-RUN pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
+#RUN pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force -SkipPublisherCheck"
 
     
 FROM msft-install AS vmware-install-arm64
