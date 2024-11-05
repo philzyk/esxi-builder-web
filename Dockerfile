@@ -139,8 +139,7 @@ RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShe
     && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    && rm ${PS_PACKAGE} \
-    && echo /usr/bin/pwsh >> /etc/shells
+    && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
