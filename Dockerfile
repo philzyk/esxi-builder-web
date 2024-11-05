@@ -124,7 +124,7 @@ RUN mkdir -p ${DOTNET_ROOT} \
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 ENV PS_VERSION=7.2
-ENV PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v${PS_MAJOR_VERSION}' | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/')
+ENV PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v${PS_VERSION}' | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/')
 RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
 && PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
 && PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz \
