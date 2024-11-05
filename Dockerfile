@@ -119,17 +119,15 @@ ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.g
 ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-ADD ${DOTNET_PACKAGE_URL} ${DOTNET_PACKAGE}
-ADD ${DOTNET_PACKAGE_URL} ${USER_TMP}/${DOTNET_PACKAGE}
 RUN mkdir -p ${DOTNET_ROOT} \
-    && chmod 644 ${USER_TMP}/${DOTNET_PACKAGE} \
-    && tar zxf ${USER_TMP}/${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
-    && rm ${USER_TMP}/${DOTNET_PACKAGE}
+    && curl -Ls ${DOTNET_PACKAGE_URL} \
+    && tar zxf ${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
+    && rm ${DOTNET_PACKAGE}
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
 ENV PS_VERSION=7.2
-RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
+RUN PS_MAJOR_VERSION=$(curl -Ls "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
     && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
     && PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
     && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
