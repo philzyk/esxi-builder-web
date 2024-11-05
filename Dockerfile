@@ -41,52 +41,38 @@ RUN apk --no-cache add \
     #libc6-compat \
     #libssl3 
 
-    #bash \
-    #bash-completion \
-    #curl \
-    #git \
-    #gcc \
-    #libc-dev \
-    #libffi-dev \
-    #linux-headers \
-    #musl-dev \
-    #python3 \
-    #py3-pip \
-    #sudo \
-    #whois \
-    #p7zip \
-    #less \
-    #make \
-    #ca-certificates \
-    #ncurses-terminfo-base \
-    #krb5-libs \
-    #libgcc \
-    #libintl \
-    #libssl1.1 \
-    #libstdc++ \
-    #tzdata \
-    #userspace-rcu \
-    #zlib \
-    #icu-libs \
-    #libc6-compat \
-    #libssl3
+    bash \
+    bash-completion \
+    curl \
+    git \
+    gcc \
+    libc-dev \
+    libffi-dev \
+    linux-headers \
+    musl-dev \
+    python3 \
+    py3-pip \
+    sudo \
+    whois \
+    p7zip \
+    less \
+    make \
+    ca-certificates \
+    ncurses-terminfo-base \
+    krb5-libs \
+    libgcc \
+    libintl \
+    libssl1.1 \
+    libstdc++ \
+    tzdata \
+    userspace-rcu \
+    zlib \
+    icu-libs \
+    libc6-compat \
+    libssl3
 
-RUN apk add --no-cache \
-        ca-certificates \
-        bash \
-        \
-        # .NET dependencies
-        krb5-libs \
-        libgcc \
-        libintl \
-        libssl3 \
-        libstdc++ \
-        zlib \
-        curl \
-        icu-data-full \
-        icu-libs \
-        git
-       # python dependencies
+# .NET dependencies
+# python dependencies
 
 
 # Install glibc
