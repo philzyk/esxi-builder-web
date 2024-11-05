@@ -176,7 +176,7 @@ FROM vmware-install-${TARGETARCH} AS vmware-install-common
 
 # Install VMware PowerCLI 7.2
 USER $USERNAME
-
+RUN pwsh -Command "Import-Module Microsoft.PowerShell.Archive"
 ARG POWERCLIURL=https://vdc-download.vmware.com/vmwb-repository/dcr-public/02830330-d306-4111-9360-be16afb1d284/c7b98bc2-fcce-44f0-8700-efed2b6275aa/VMware-PowerCLI-13.0.0-20829139.zip
 ARG POWERCLI_PATH="/home/${USERNAME}/powershell/Modules"
 ADD ${POWERCLIURL} /tmp/VMware-PowerCLI-13.0.0-20829139.zip
