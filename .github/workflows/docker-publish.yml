@@ -31,10 +31,10 @@ jobs:
           context: .
           platforms: windows/amd64,windows/arm64
           push: true
-          tags: philzy/esxi-iso-builder:latest
+          tags: philzy/esxi-builder-web:latest
       - name: Update README on Docker
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: philzy/esxi-iso-builder
+          repository: philzy/esxi-builder-web

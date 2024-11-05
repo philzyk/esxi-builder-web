@@ -1,4 +1,3 @@
-# Use multi-stage builds for architecture-specific images
 # Use a base image for Windows Server Core
 FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS base
 
