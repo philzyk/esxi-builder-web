@@ -100,8 +100,9 @@ RUN addgroup -g $USER_GID $USERNAME && \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 ARG USER_TMP=${WORKDIR}/tmp
+RUN mkdir -p ${USER_TMP}
 
-
+# Setting ARCH ARGs for linux-amd64 & linux-arm64
 FROM base AS linux-amd64
 ARG ARCH=x64
 ARG UID_URL=e94c26b7-6ac0-46b9-81f1-e008ce8348cb/41d57ffacf3e151de8039ec3cd007a68
@@ -110,12 +111,12 @@ FROM base AS linux-arm64
 ARG ARCH=arm64
 ARG UID_URL=2672b266-880f-4ec1-ab89-bcd235c59193/d37f0755df26313e7a7bbf6dbcf9184e
 
+# Install Microsoft .NET Core Runtime
 FROM linux-${TARGETARCH} AS msft-install
 
-# Microsoft .NET Core 3.1 Runtime for VMware PowerCLI
+# Microsoft .NET Core 3.1 Runtime для VMware PowerCLI
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
-ARG DOTNET_PACKAGE_URL=https://dotnetcli.azureedge.net/dotnet/Runtime/${DOTNET_VERSION}/${DOTNET_PACKAGE}
 ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
