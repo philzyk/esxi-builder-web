@@ -120,14 +120,14 @@ ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/$
 ENV DOTNET_ROOT=/home/${USERNAME}/dotnet/${DOTNET_VERSION}
 ENV PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 RUN mkdir -p ${DOTNET_ROOT} \
-    && curl -Ls ${DOTNET_PACKAGE_URL} \
+    && curl -s ${DOTNET_PACKAGE_URL} \
     && tar zxf ${DOTNET_PACKAGE} -C ${DOTNET_ROOT} \
     && rm ${DOTNET_PACKAGE}
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
 ENV PS_VERSION=7.2
-RUN PS_MAJOR_VERSION=$(curl -Ls "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
+RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
     && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
     && PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
     && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
