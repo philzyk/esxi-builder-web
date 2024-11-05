@@ -91,7 +91,7 @@ ARG USER_GID=$USER_UID
 
 # Set up non-root user with sudo privilege
 RUN addgroup -g $USER_GID $USERNAME \
-    && adduser -D -u $USER_UID -G $USERNAME -s /home/$USERNAME/pwsh $USERNAME \
+    && adduser -D -u $USER_UID -G $USERNAME -s /bin/sh $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && echo "/home/$USERNAME/pwsh >> /etc/shells" \
@@ -145,9 +145,9 @@ RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShe
     && rm ${PS_PACKAGE}
 
 # Check installed versions of .NET and PowerShell
-RUN pwsh -Command "Write-Output \$PSVersionTable" \
-    && pwsh -Command "dotnet --list-runtimes" \
-    && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
+RUN /home/${USERNAME}/pwsh -Command "Write-Output \$PSVersionTable" \
+    && /home/${USERNAME}/pwsh -Command "dotnet --list-runtimes" \
+    && /home/${USERNAME}/pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
 FROM msft-install AS vmware-install-arm64
 
