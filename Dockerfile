@@ -135,12 +135,12 @@ RUN pwsh -Command "Write-Output \$PSVersionTable" \
     && pwsh -Command "dotnet --list-runtimes" \
     && pwsh -Command "\$DebugPreference='Continue'; Write-Output 'Debug preference set to Continue'"
     
-RUN pwsh -Command " \
-    Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; \
-    if (-not (Get-Module -ListAvailable -Name PowerShellGet)) { \
-        Install-Module -Name PowerShellGet -Force -Scope AllUsers; \
-    }; \
-    Install-Module -Name Microsoft.PowerShell.Archive -Force -Scope AllUsers"
+
+
+RUN pwsh -Command "Set-PSRepository -Name PSGallery -InstallationPolicy Trusted" \
+    && pwsh -Command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force" \
+    && pwsh -Command "Install-Module -Name Microsoft.PowerShell.Archive -Force"
+
     
 FROM msft-install AS vmware-install-arm64
 
