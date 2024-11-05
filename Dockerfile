@@ -99,8 +99,6 @@ RUN addgroup -g $USER_GID $USERNAME && \
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
-ARG USER_TMP=${WORKDIR}/tmp
-
 
 # Setting ARCH ARGs for linux-amd64 & linux-arm64
 FROM base AS linux-amd64
@@ -115,6 +113,7 @@ ARG UID_URL=2672b266-880f-4ec1-ab89-bcd235c59193/d37f0755df26313e7a7bbf6dbcf9184
 FROM linux-${TARGETARCH} AS msft-install
 
 # Microsoft .NET Core 3.1 Runtime для VMware PowerCLI
+ARG USER_TMP=${WORKDIR}/tmp
 ARG DOTNET_VERSION=3.1.32
 ARG DOTNET_PACKAGE=aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
 ARG DOTNET_PACKAGE_URL=https://download.visualstudio.microsoft.com/download/pr/${UID_URL}/aspnetcore-runtime-${DOTNET_VERSION}-linux-musl-${ARCH}.tar.gz
