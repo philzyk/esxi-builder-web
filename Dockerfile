@@ -49,7 +49,7 @@ RUN apk --no-cache add \
     libc-dev \
     libffi-dev \
     linux-headers \
-    musl-dev \
+    #musl-dev \
     python3 \
     py3-pip \
     sudo \
@@ -135,9 +135,11 @@ FROM linux-${TARGETARCH} AS msft-install
 #    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 #export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH
-ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
+#ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
 #export DOTNET_ROOT=$(dirname $(realpath $(which dotnet)))
-ENV DOTNET_ROOT="/root/.dotnet"
+#ENV DOTNET_ROOT="/root/.dotnet"
+
+ENV DOTNET_ROOT=/usr/share/powershell/7.2.24
 
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
 # Set PowerShell version
