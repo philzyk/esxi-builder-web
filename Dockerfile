@@ -90,11 +90,11 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 # Set up non-root user with sudo privilege
-RUN addgroup -g $USER_GID $USERNAME && \
-    adduser -D -u $USER_UID -G $USERNAME -s /bin/sh $USERNAME && \  # Use /bin/sh as a shell
-    echo "$USERNAME ALL=(root) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME && \
-    echo /home/$USERNAME/pwsh >> /etc/shells && \  # Ensure pwsh is in the correct place after installation
+RUN addgroup -g $USER_GID $USERNAME \
+    && adduser -D -u $USER_UID -G $USERNAME -s /bin/sh $USERNAME \
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && echo "/home/$USERNAME/pwsh >> /etc/shells" \
     cat /etc/shells
 
 
