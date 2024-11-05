@@ -123,23 +123,22 @@ RUN mkdir -p ${DOTNET_ROOT} \
     && rm /tmp/${DOTNET_PACKAGE}
     
 # PowerShell Core 7.2 (LTS) - forcing to install exact version
+# Set PowerShell version
 ENV PS_VERSION=7.2
-ENV PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v${PS_VERSION}' | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/')
-RUN echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
-&& PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
-&& PS_PACKAGE=powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz \
-&& PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE} \
-&& echo "PowerShell Package: ${PS_PACKAGE}" \
-&& echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
-&& curl -LO ${PS_PACKAGE_URL} \
-&& mkdir -p ${PS_INSTALL_FOLDER} \
-&& tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
-&& chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-&& ls -lah ${PS_INSTALL_FOLDER} \
-&& ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-&& rm ${PS_PACKAGE} \
-# && echo /usr/bin/pwsh >> /etc/shells \
-&&  cat /etc/shells
+RUN PS_MAJOR_VERSION=$(curl -s "https://api.github.com/repos/PowerShell/PowerShell/releases" | grep '"tag_name": "v'${PS_VERSION} | head -1 | sed 's/.*"v\([0-9.]*\)".*/\1/') \
+    && echo "PowerShell Major Version: ${PS_MAJOR_VERSION}" \
+    && PS_INSTALL_FOLDER=/home/${USERNAME}/powershell/${PS_MAJOR_VERSION} \
+    && PS_PACKAGE="powershell-${PS_MAJOR_VERSION}-linux-${ARCH}.tar.gz" \
+    && PS_PACKAGE_URL="https://github.com/PowerShell/PowerShell/releases/download/v${PS_MAJOR_VERSION}/${PS_PACKAGE}" \
+    && echo "PowerShell Package: ${PS_PACKAGE}" \
+    && echo "PowerShell Package URL: ${PS_PACKAGE_URL}" \
+    && curl -LO ${PS_PACKAGE_URL} \
+    && mkdir -p ${PS_INSTALL_FOLDER} \
+    && tar zxf ${PS_PACKAGE} -C ${PS_INSTALL_FOLDER} \
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && rm ${PS_PACKAGE} \
+    && echo /usr/bin/pwsh >> /etc/shells
 
 # Check installed versions of .NET and PowerShell
 RUN pwsh -Command "Write-Output \$PSVersionTable" \
