@@ -1,5 +1,5 @@
 # Use a base image for Windows Server Core
-FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS base
+FROM mcr.microsoft.com/windows/servercore:ltsc2019 AS base
 
 # Set architecture-specific variables
 ARG PYTHON_VERSION=3.7.9
